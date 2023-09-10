@@ -1,3 +1,4 @@
+import { mockIPC } from '@tauri-apps/api/mocks';
 import { Greeter } from './index';
 
 describe('greeter', () => {
@@ -35,4 +36,30 @@ describe('greeter', () => {
         expect(greetInput).toBeTruthy();
         expect(greetInput?.form).toEqual(greeter.shadowRoot?.querySelector('#greet-form'));
     });
+
+
+    it('should set the greeting message inside the message element', async () => {
+        const greeter = document.createElement('yag-greeter');
+        const name = 'John Doe';
+        const greetForm = greeter.shadowRoot?.querySelector('#greet-form') as HTMLFormElement;
+        const greetInput = greeter.shadowRoot?.querySelector('#greet-input') as HTMLInputElement;
+        const greetMsgEl = greeter.shadowRoot?.querySelector('#greet-msg') as HTMLElement;
+
+        greetInput.value = name;
+    
+        mockIPC((cmd, args) => {
+          if(cmd === "greet") {
+              return `Hello, ${args.name}! You've been greeted from Rust!`;
+          }
+        });
+    
+        await dispatchFormSubmit(greetForm);
+        
+        expect(greetMsgEl?.textContent).toBe(`Hello, ${name}! You've been greeted from Rust!`);
+    });
 });
+
+const dispatchFormSubmit = async (greetForm: HTMLFormElement) => {
+    greetForm.dispatchEvent(new Event("submit"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+}
