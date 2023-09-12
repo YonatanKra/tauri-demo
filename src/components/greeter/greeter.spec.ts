@@ -53,7 +53,8 @@ describe('greeter', () => {
           }
         });
     
-        await dispatchFormSubmit(greetForm);
+        greetForm.dispatchEvent(new Event("submit"));
+        await new Promise((resolve) => setTimeout(resolve, 0));
         
         expect(greetMsgEl?.textContent).toBe(`Hello, ${name}! You've been greeted from Rust!`);
     });
