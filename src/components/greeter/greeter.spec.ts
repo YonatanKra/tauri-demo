@@ -59,8 +59,3 @@ describe('greeter', () => {
         expect(greetMsgEl?.textContent).toBe(`Hello, ${name}! You've been greeted from Rust!`);
     });
 });
-
-const dispatchFormSubmit = async (greetForm: HTMLFormElement) => {
-    greetForm.dispatchEvent(new Event("submit"));
-    await new Promise((resolve) => setTimeout(resolve, 0));
-}
