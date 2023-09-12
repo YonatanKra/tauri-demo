@@ -1,4 +1,7 @@
 import { invoke } from "@tauri-apps/api/tauri";
+import { Greeter } from "./components/greeter";
+
+customElements.define("yag-greeter", Greeter);
 
 let greetInputEl: HTMLInputElement | null;
 let greetMsgEl: HTMLElement | null;
