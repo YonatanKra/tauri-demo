@@ -12,7 +12,7 @@ const templateElement = document.createElement('template');
 templateElement.innerHTML = template;
 
 export class Greeter extends HTMLElement {
-  #greet = async () => {
+  #submitNameAndOutputRecievedGreet = async () => {
       const greetInputEl = this.shadowRoot?.querySelector('#greet-input') as HTMLInputElement;
       const greetMsgEl = this.shadowRoot?.querySelector('#greet-msg') as HTMLElement;
       greetMsgEl.textContent = await invoke('greet', {
@@ -27,7 +27,7 @@ export class Greeter extends HTMLElement {
     this.shadowRoot?.appendChild(templateHTML);
     this.shadowRoot?.querySelector('#greet-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
-      this.#greet();
+      this.#submitNameAndOutputRecievedGreet();
     });
   }
 }
