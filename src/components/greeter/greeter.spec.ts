@@ -2,25 +2,31 @@ import { mockIPC } from '@tauri-apps/api/mocks';
 import { Greeter } from './index';
 
 describe('greeter', () => {
+    let greeter: Greeter;
+
+    beforeAll(() => {
+        customElements.define('yag-greeter', Greeter);        
+    });
+
+    beforeEach(() => {
+        greeter = document.createElement('yag-greeter');
+    });
+    
     it('should be defined', () => {
         expect(Greeter).toBeDefined();
     });
 
     it ('should set a shadow DOM with mode open', () => {
-        customElements.define('yag-greeter', Greeter);
-        const greeter = document.createElement('yag-greeter');
         expect(greeter.shadowRoot).toBeDefined();
         expect(greeter.shadowRoot?.mode).toBe('open');
     });
 
 
     it ('should have a shadow root with mode open', () => {
-        const greeter = document.createElement('yag-greeter');
         expect(greeter.shadowRoot?.mode).toBe('open');
     });
 
-    it ('should have greet button inside', () => {
-        const greeter = document.createElement('yag-greeter');
+    it ('should have greet button inside', () => { 
         expect(greeter.shadowRoot?.querySelector('#greet-form button')).toBeTruthy();
     });
 
@@ -31,7 +37,6 @@ describe('greeter', () => {
     });
 
     it ('should have greet input inside', () => {
-        const greeter = document.createElement('yag-greeter');
         const greetInput = greeter.shadowRoot?.querySelector('#greet-input');
         expect(greetInput).toBeTruthy();
         expect(greetInput?.form).toEqual(greeter.shadowRoot?.querySelector('#greet-form'));
@@ -39,7 +44,6 @@ describe('greeter', () => {
 
 
     it('should set the greeting message inside the message element', async () => {
-        const greeter = document.createElement('yag-greeter');
         const name = 'John Doe';
         const greetForm = greeter.shadowRoot?.querySelector('#greet-form') as HTMLFormElement;
         const greetInput = greeter.shadowRoot?.querySelector('#greet-input') as HTMLInputElement;
@@ -53,9 +57,13 @@ describe('greeter', () => {
           }
         });
     
-        greetForm.dispatchEvent(new Event("submit"));
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        await dispatchFormSubmit(greetForm);
         
         expect(greetMsgEl?.textContent).toBe(`Hello, ${name}! You've been greeted from Rust!`);
     });
 });
+
+const dispatchFormSubmit = async (greetForm: HTMLFormElement) => {
+    greetForm.dispatchEvent(new Event("submit"));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+}
