@@ -10,6 +10,11 @@ describe('greeter', () => {
 
     beforeEach(() => {
         greeter = document.createElement('yag-greeter');
+        document.body.appendChild(greeter);
+    });
+
+    afterEach(() => {
+        greeter.remove();
     });
     
     it('should be defined', () => {
@@ -27,7 +32,7 @@ describe('greeter', () => {
     });
 
     it ('should have greet button inside', () => { 
-        expect(greeter.shadowRoot?.querySelector('#greet-form button')).toBeTruthy();
+        expect(greeter.shadowRoot?.querySelector('#greet-form [type="submit"]')).toBeTruthy();
     });
 
 
@@ -36,7 +41,7 @@ describe('greeter', () => {
         expect(greeter.shadowRoot?.querySelector('#greet-form')).toBeTruthy();
     });
 
-    it ('should have greet input inside', () => {
+    it ('should have greet input inside the form', () => {
         const greetInput = greeter.shadowRoot?.querySelector('#greet-input');
         expect(greetInput).toBeTruthy();
         expect(greetInput?.form).toEqual(greeter.shadowRoot?.querySelector('#greet-form'));
