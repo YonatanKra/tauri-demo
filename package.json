@@ -11,7 +11,8 @@
     "test:frontend": "vitest"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.4.0"
+    "@tauri-apps/api": "^1.4.0",
+    "@vonage/vivid": "^3.35.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.4.0",
