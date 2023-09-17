@@ -1,7 +1,3 @@
-export const template = ``;
-const templateElement = document.createElement('template');
-templateElement.innerHTML = template;
-
 export class App extends HTMLElement{
 
     #authComponent?: HTMLElement;
@@ -9,8 +5,6 @@ export class App extends HTMLElement{
     constructor(){
         super();
         this.attachShadow({mode: 'open'});
-        const templateHTML = templateElement.content.cloneNode(true);
-        this.shadowRoot?.appendChild(templateHTML);
     }
 
     connectedCallback(){

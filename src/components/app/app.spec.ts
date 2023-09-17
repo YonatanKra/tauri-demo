@@ -17,7 +17,12 @@ let authComponent: MockAuth | HTMLElement = document.createElement('div');
 let isLoggedIn = true;
 
 describe('app', () => {
+    function getElementInView(query: string) {
+        return app.shadowRoot?.querySelector(query);
+    }
+    
     let app: App;
+
     beforeEach(() => {
         app = document.createElement('yag-app') as App;
     });
@@ -33,12 +38,12 @@ describe('app', () => {
     it('should remove `yag-greeter` when user is not logged in', () => {
         isLoggedIn = false;
         app.connectedCallback();
-        expect(app.shadowRoot?.querySelector('yag-greeter')).toBeFalsy();
+        expect(getElementInView('yag-greeter')).toBeFalsy();
     });
 
     it('should display `yag-greeter` when user is logged in', () => {
         isLoggedIn = true;
         app.connectedCallback();        
-        expect(app.shadowRoot?.querySelector('yag-greeter')).toBeTruthy();
+        expect(getElementInView('yag-greeter')).toBeTruthy();
     });
 });
