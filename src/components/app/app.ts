@@ -1,4 +1,4 @@
-export class App extends HTMLElement{
+export class App extends HTMLElement {
 
     #setViewAccordingToUserStatus = () => {
         if (this.#authComponent!.isLoggedIn?.() === false) {
