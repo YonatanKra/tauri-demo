@@ -8,7 +8,7 @@ class MockAuth extends HTMLElement {
         authComponent = this;
     }
 
-    isLoggedIn() {
+    isLoggedIn?() {
         return isLoggedIn;
     }
 }
@@ -102,6 +102,13 @@ describe('app', () => {
         expect(removeEventListenerSpy).toHaveBeenCalledWith('user-status-change', expect.any(Function));
         expect(removeEventListenerSpy.mock.calls[0][1]).toBe(addEventListenerSpy.mock.calls[0][1]);
         addEventListenerSpy.mockRestore();
+    });
+
+    it('should display login screen if auth component is not initialized', () => {
+        isLoggedIn = true;
+        MockAuth.prototype.isLoggedIn = undefined;
+        app.connectedCallback();
+        expect(getElementInView('yag-login')).toBeTruthy();
     });
 
 });

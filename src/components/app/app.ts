@@ -1,7 +1,7 @@
 export class App extends HTMLElement {
 
     #setViewAccordingToUserStatus = () => {
-        if (this.#authComponent!.isLoggedIn?.() === false) {
+        if (!this.#authComponent!.isLoggedIn || this.#authComponent!.isLoggedIn?.() === false) {
             this.shadowRoot!.innerHTML = `<yag-login></yag-login>`;
         } else {
             this.shadowRoot!.innerHTML = `<yag-greeter></yag-greeter>`;
