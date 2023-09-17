@@ -22,4 +22,8 @@ export class App extends HTMLElement{
         }
         this.#setViewAccordingToUserStatus();
     }
+
+    disconnectedCallback() {
+        this.#authComponent?.removeEventListener('user-status-change', this.#setViewAccordingToUserStatus);
+    }
 }

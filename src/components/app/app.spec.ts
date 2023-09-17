@@ -90,4 +90,18 @@ describe('app', () => {
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(getElementInView('yag-greeter')).toBeFalsy();
     });
+
+    it('should remove `user-status-change` listener to the old authComponent', () => {
+        const addEventListenerSpy = vi.spyOn(HTMLElement.prototype, 'addEventListener');
+        app.connectedCallback();
+        const oldAuthComponent = authComponent;  
+        const removeEventListenerSpy = vi.spyOn(oldAuthComponent, 'removeEventListener');   
+        app.disconnectedCallback();
+        app.connectedCallback();
+        expect(addEventListenerSpy).toHaveBeenCalledWith('user-status-change', expect.any(Function));
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('user-status-change', expect.any(Function));
+        expect(removeEventListenerSpy.mock.calls[0][1]).toBe(addEventListenerSpy.mock.calls[0][1]);
+        addEventListenerSpy.mockRestore();
+    });
+
 });
