@@ -59,4 +59,35 @@ describe('app', () => {
         expect(getElementInView('yag-login')).toBeFalsy();
     });
 
+    it('should display `yag-login` when user logs out', () => {
+        isLoggedIn = true;
+        app.connectedCallback();
+        isLoggedIn = false;
+        authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+        expect(getElementInView('yag-login')).toBeTruthy();
+    });
+
+    it('should hide yag-login when user logs in', () => {
+        isLoggedIn = false;
+        app.connectedCallback();
+        isLoggedIn = true;
+        authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+        expect(getElementInView('yag-login')).toBeFalsy();
+    });
+
+    it('should display `yag-greeter` when user logs in', () => {
+        isLoggedIn = false;
+        app.connectedCallback();
+        isLoggedIn = true;
+        authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+        expect(getElementInView('yag-greeter')).toBeTruthy();
+    });
+
+    it('should hide `yag-greeter` when user logs out', () => {
+        isLoggedIn = true;
+        app.connectedCallback();
+        isLoggedIn = false;
+        authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+        expect(getElementInView('yag-greeter')).toBeFalsy();
+    });
 });
