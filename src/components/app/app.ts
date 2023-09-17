@@ -10,7 +10,7 @@ export class App extends HTMLElement{
     connectedCallback(){
         this.#authComponent = document.createElement('yag-auth') as HTMLElement;
         if (this.#authComponent.isLoggedIn?.() === false) {
-            this.shadowRoot!.innerHTML = ``;
+            this.shadowRoot!.innerHTML = `<yag-login></yag-login>`;
         } else {
             this.shadowRoot!.innerHTML = `<yag-greeter></yag-greeter>`;
         }

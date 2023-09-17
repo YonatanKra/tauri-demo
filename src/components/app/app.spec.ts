@@ -46,4 +46,17 @@ describe('app', () => {
         app.connectedCallback();        
         expect(getElementInView('yag-greeter')).toBeTruthy();
     });
+
+    it('should display `yag-login` when user is not logged in', () => {
+        isLoggedIn = false;
+        app.connectedCallback();
+        expect(getElementInView('yag-login')).toBeTruthy();
+    });
+
+    it('should remove `yag-login` when user is logged in', () => {
+        isLoggedIn = true;
+        app.connectedCallback();
+        expect(getElementInView('yag-login')).toBeFalsy();
+    });
+
 });
