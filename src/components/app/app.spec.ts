@@ -11,6 +11,8 @@ class MockAuth extends HTMLElement {
     isLoggedIn?() {
         return isLoggedIn;
     }
+
+    login(_email: string, _password: string) {}
 }
 customElements.define('yag-auth', MockAuth);
 let authComponent: MockAuth | HTMLElement = document.createElement('div');
@@ -106,9 +108,33 @@ describe('app', () => {
 
     it('should display login screen if auth component is not initialized', () => {
         isLoggedIn = true;
+        const originalIsLoggedIn = MockAuth.prototype.isLoggedIn;
         MockAuth.prototype.isLoggedIn = undefined;
         app.connectedCallback();
+        MockAuth.prototype.isLoggedIn = originalIsLoggedIn;
         expect(getElementInView('yag-login')).toBeTruthy();
+    });
+
+    it('should evoke the login function from Auth on `login-attempt` event', () => {
+        isLoggedIn = false;
+        app.connectedCallback();
+        const email = 'ff@gmail.com';
+        const password = '123456';
+        const loginComponent = app.shadowRoot?.querySelector('yag-login');
+        const spy = vi.spyOn(authComponent, 'login');
+        loginComponent!.dispatchEvent(new CustomEvent('login-attempt', {detail: {email, password}}));
+        expect(spy).toHaveBeenCalledWith(email, password);
+    });
+
+    it('should remove `login-attempt` listener to the old loginComponent', () => {
+        isLoggedIn = false;
+        app.connectedCallback();
+        const oldLoginComponent = app.shadowRoot?.querySelector('yag-login') as HTMLElement;  
+        const removeEventListenerSpy = vi.spyOn(oldLoginComponent, 'removeEventListener'); 
+        isLoggedIn = true;  
+        authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('login-attempt', expect.any(Function));
+        removeEventListenerSpy.mockRestore();
     });
 
 });
