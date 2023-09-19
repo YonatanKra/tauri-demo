@@ -4,15 +4,24 @@ export class App extends HTMLElement {
         const { email, password } = (<CustomEvent>e).detail;
         this.#authComponent?.login(email, password);
     }
+
+    get #loginElement () {
+        return this.shadowRoot!.querySelector('yag-login') as HTMLElement;
+    }
+    #setLoginListener = () => {
+        this.#loginElement.addEventListener('login-attempt', this.#handleLoginAttempt);
+    }
+
+    #unsetLoginListener = () => {
+        this.#loginElement?.removeEventListener('login-attempt', this.#handleLoginAttempt);
+    }
+
     #setViewAccordingToUserStatus = () => {
-        
         if (!this.#authComponent!.isLoggedIn || this.#authComponent!.isLoggedIn?.() === false) {
             this.shadowRoot!.innerHTML = `<yag-login></yag-login>`;
-            const loginElement = this.shadowRoot!.querySelector('yag-login') as HTMLElement;
-            loginElement.addEventListener('login-attempt', this.#handleLoginAttempt);
+            this.#setLoginListener();
         } else {
-            const loginElement = this.shadowRoot!.querySelector('yag-login') as HTMLElement;
-            loginElement?.removeEventListener('login-attempt', this.#handleLoginAttempt);
+            this.#unsetLoginListener();
             this.shadowRoot!.innerHTML = `<yag-greeter></yag-greeter>`;
         }
     }
