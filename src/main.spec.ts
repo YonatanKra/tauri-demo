@@ -12,5 +12,13 @@ describe('main', () => {
   it('should set yag-app inside the body', () => {
     expect(document.body.innerHTML).toBe('<yag-app></yag-app>');
   });
+
+  it ('should define yag-login', () => {
+    expect(customElements.get('yag-login')).toBeDefined();
+  });
+
+  it ('should define yag-auth', () => {
+    expect(customElements.get('yag-auth')).toBeDefined();
+  });
 });
 
