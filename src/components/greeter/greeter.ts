@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api";
 import '@vonage/vivid/button';
 import '@vonage/vivid/text-field';
 
-export const template = `
+const template = `
                 <form class="row" id="greet-form" name="greet-form">
                   <vwc-text-field id="greet-input"
                                  placeholder="Enter a name..."></vwc-text-field>
