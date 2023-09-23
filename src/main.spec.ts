@@ -20,5 +20,9 @@ describe('main', () => {
   it ('should define yag-auth', () => {
     expect(customElements.get('yag-auth')).toBeDefined();
   });
+
+  it ('should define yag-firebase', () => {
+    expect(customElements.get('yag-firebase')).toBeDefined();
+  });
 });
 
