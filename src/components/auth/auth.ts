@@ -1,4 +1,4 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export class Auth extends HTMLElement {
 
@@ -7,7 +7,12 @@ export class Auth extends HTMLElement {
     }
 
     async login(email: string, password: string) {
-        await signInWithEmailAndPassword(getAuth(), email, password);
+        const signInMethods = await fetchSignInMethodsForEmail(getAuth(), email);
+        if (signInMethods.length === 0) {
+            await createUserWithEmailAndPassword(getAuth(), email, password);
+        } else {
+            await signInWithEmailAndPassword(getAuth(), email, password);
+        }
         if (this.isLoggedIn()) {
             this.dispatchEvent(new CustomEvent('user-status-change'));
         }
