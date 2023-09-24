@@ -1,7 +1,6 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 export class Auth extends HTMLElement {
-    #isLoggedIn = false;
 
     isLoggedIn() {
         return getAuth().currentUser !== null;

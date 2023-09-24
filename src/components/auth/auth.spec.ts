@@ -31,63 +31,39 @@ describe('auth', () => {
 
     describe('login', () => {
 
+        let firebaseAuth: any;
+
+        beforeEach(async () => {
+            firebaseAuth = await import('firebase/auth');
+        });
+
         it('should toggle `isLoggedIn` if login successful', async () => {
-            const firebaseAuth = await import('firebase/auth');
-            
-            (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(async () => {
-                const user = {
-                    uid: '123',
-                    email: 'test@test.com'
-                };
+            setLogin(firebaseAuth, SUCCESSFUL);
 
-                (firebaseAuth.getAuth as any).mockReturnValue({
-                    currentUser: user
-                });
-                return {
-                    user
-                }
-            });
-
-            await auth.login();
+            await auth.login('email', 'password');
             expect(auth.isLoggedIn()).toBe(true);
         });
 
         it('should call `signInWithEmailAndPassword` with auth, email and password', async () => {
             const email = 't@t.com';
             const password = '123456';
-            const firebaseAuth = await import('firebase/auth');
             await auth.login(email, password);
             expect(firebaseAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(firebaseAuth.getAuth(), email, password);
         });
 
         it('should emit `user-status-change` event when login successful', async () => {
-            const firebaseAuth = await import('firebase/auth');
-            (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(async () => {
-                (firebaseAuth.getAuth as any).mockReturnValue({
-                    currentUser: {
-                        uid: '123',
-                        email: 'test@test.com'
-                    }
-                });
-            });
-            const spy = vi.fn();
-            auth.addEventListener('user-status-change', spy);
+            setLogin(firebaseAuth, SUCCESSFUL);
+            const spy = spyOnUserStatusChangeEvent(auth);
 
             await auth.login('email', 'password');
             const eventCallsWithSuccessfulLogin = spy.mock.calls.length;
 
             expect(eventCallsWithSuccessfulLogin).toBe(1);
         });
-
+        
         it('should prevent emit of event `user-status-change` when login unsuccessful', async () => {
-            const firebaseAuth = await import('firebase/auth');
-            (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(async () => {
-                (firebaseAuth.getAuth as any).mockReturnValue({
-                    currentUser: null
-                });
-            });
-            const spy = vi.fn();
-            auth.addEventListener('user-status-change', spy);
+            setLogin(firebaseAuth, UNSUCCESSFUL);
+            const spy = spyOnUserStatusChangeEvent(auth);
 
             await auth.login('email', 'password');
             const eventCallsWithUnsuccessfulLogin = spy.mock.calls.length;
@@ -97,3 +73,29 @@ describe('auth', () => {
 
     });
 });
+
+const SUCCESSFUL = true;
+const UNSUCCESSFUL = false;
+function setLogin(firebaseAuth: any, successful: boolean) {
+    (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(async () => {
+        const user = {
+            uid: '123',
+            email: 'test@test.com'
+        };
+
+        (firebaseAuth.getAuth as any).mockReturnValue({
+            currentUser: successful ? user : null
+        });
+
+
+        return {
+            user
+        };
+    });
+}
+
+function spyOnUserStatusChangeEvent(auth: Auth) {
+    const spy = vi.fn();
+    auth.addEventListener('user-status-change', spy);
+    return spy;
+}
