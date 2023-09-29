@@ -13,6 +13,8 @@ class MockAuth extends HTMLElement {
     }
 
     login(_email: string, _password: string) {}
+
+    logout = vi.fn();
 }
 customElements.define('yag-auth', MockAuth);
 let authComponent: MockAuth | HTMLElement = document.createElement('div');
@@ -136,5 +138,59 @@ describe('app', () => {
         expect(removeEventListenerSpy).toHaveBeenCalledWith('login-attempt', expect.any(Function));
         removeEventListenerSpy.mockRestore();
     });
+
+    describe('login button', () => {
+        function getLogoutButton() {
+            return app.shadowRoot?.querySelector('#login-button');
+        }
+
+        function isLoginButtonHidden() {
+            const logoutButton = getLogoutButton();
+            return logoutButton?.getAttribute('slot') === 'hidden';
+        }
+
+        function isLoginButtonVisible() {
+            const logoutButton = getLogoutButton();
+            return logoutButton?.getAttribute('slot') === 'action-items';
+        }
+
+        it('should show a logout button to the header when user is logged in', () => {
+            isLoggedIn = true;
+            app.connectedCallback();
+            expect(isLoginButtonVisible()).toBe(true);
+        });
+        
+        it('should hide the logout button from the header when user is logged out', () => {
+            isLoggedIn = true;
+            app.connectedCallback();
+            isLoggedIn = false;
+            app.connectedCallback();
+            expect(isLoginButtonHidden()).toBe(true);
+        });    
+
+        it('should add a logout button to the header when user logs in', () => {
+            isLoggedIn = false;
+            app.connectedCallback();
+            isLoggedIn = true;
+            authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+            expect(isLoginButtonVisible()).toBe(true);
+        });
+
+        it('should remove the logout button from the header when user logs out', () => {
+            isLoggedIn = true;
+            app.connectedCallback();
+            isLoggedIn = false;
+            authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+            expect(isLoginButtonHidden()).toBe(true);
+        });
+
+        it('should call `logout` on auth component when logout button is clicked', () => {
+            isLoggedIn = true;
+            app.connectedCallback();
+            getLogoutButton()?.dispatchEvent(new CustomEvent('click'));
+            expect(authComponent.logout).toHaveBeenCalled();
+        });
+    });
+    
 
 });

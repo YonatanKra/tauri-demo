@@ -9,6 +9,7 @@ vi.mock('firebase/auth', () => {
         signInWithEmailAndPassword: vi.fn(),
         fetchSignInMethodsForEmail: vi.fn(),
         createUserWithEmailAndPassword: vi.fn(),
+        signOut: vi.fn()
     }
 });
 
@@ -105,6 +106,28 @@ describe('auth', () => {
             const eventCallsWithUnsuccessfulLogin = spy.mock.calls.length;
 
             expect(eventCallsWithUnsuccessfulLogin).toBe(0);
+        });
+    });
+
+    describe('logout', () => {
+        let firebaseAuth: any;
+
+        beforeEach(async () => {
+            firebaseAuth = await import('firebase/auth');
+        });
+
+        it('should call firebase signOut', async () => {
+            auth.logout();
+            expect(firebaseAuth.signOut).toHaveBeenCalledWith(firebaseAuth.getAuth());
+        });
+
+        it('should emit `user-status-change` event', async () => {
+            const spy = spyOnUserStatusChangeEvent(auth);
+
+            await auth.logout();
+            const eventCalls = spy.mock.calls.length;
+
+            expect(eventCalls).toBe(1);
         });
     });
 });

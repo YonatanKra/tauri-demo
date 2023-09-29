@@ -1,4 +1,16 @@
+import '@vonage/vivid/header';
+import '@vonage/vivid/layout';
+import '@vonage/vivid/button';
+
 export class App extends HTMLElement {
+
+    get #mainContent() {
+        return this.shadowRoot!.getElementById('main-content') as HTMLElement;
+    }
+
+    get #loginButton() {
+        return this.shadowRoot!.getElementById('login-button') as HTMLElement;
+    }
 
     #handleLoginAttempt = (e: Event) => {
         const { email, password } = (<CustomEvent>e).detail;
@@ -18,11 +30,13 @@ export class App extends HTMLElement {
 
     #setViewAccordingToUserStatus = () => {
         if (!this.#authComponent!.isLoggedIn || this.#authComponent!.isLoggedIn?.() === false) {
-            this.shadowRoot!.innerHTML = `<yag-login></yag-login>`;
+            this.#loginButton.setAttribute('slot', 'hidden');
+            this.#mainContent.innerHTML = `<yag-login></yag-login>`;
             this.#setLoginListener();
         } else {
+            this.#loginButton.setAttribute('slot', 'action-items');
             this.#unsetLoginListener();
-            this.shadowRoot!.innerHTML = `<yag-greeter></yag-greeter>`;
+            this.#mainContent.innerHTML = `<yag-greeter></yag-greeter>`;
         }
     }
 
@@ -31,6 +45,18 @@ export class App extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
+        this.shadowRoot!.innerHTML = `
+            <vwc-header>
+                <h1>Your Awesome Game!</h1> (yag... dah...)
+                <vwc-button id="login-button" slot="hidden" appearance="filled" connotation="alert" label="Sign out"></vwc-button>
+                <main slot="app-content">
+                    <vwc-layout gutters="small" id="main-content">
+                        Application content
+                    </vwc-layout>
+                </main>
+            </vwc-header>
+        `;
+        this.#loginButton.addEventListener('click', () => this.#authComponent?.logout());
     }
 
     connectedCallback() {
