@@ -139,13 +139,11 @@ describe('auth', () => {
 
 const SUCCESSFUL = true;
 const UNSUCCESSFUL = false;
-function setLogin(firebaseAuth: any, successful: boolean) {
-    (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(async () => {
-        const user = {
-            uid: '123',
-            email: 'test@test.com'
-        };
-
+function setUserCreds(firebaseAuth: any, successful: boolean, user = {
+    uid: '123',
+    email: 'test@test.com'
+}) {
+    return async () => {
         (firebaseAuth.getAuth as any).mockReturnValue({
             currentUser: successful ? user : null
         });
@@ -155,27 +153,18 @@ function setLogin(firebaseAuth: any, successful: boolean) {
         return {
             user
         };
-    });
+    }
+}
+
+function setLogin(firebaseAuth: any, successful: boolean) {
+    (firebaseAuth.signInWithEmailAndPassword as any).mockImplementation(setUserCreds(firebaseAuth, successful));
 }
 
 function setSignUp(firebaseAuth: any, successful: boolean) {
-    (firebaseAuth.createUserWithEmailAndPassword as any).mockImplementation(async () => {
-        const user = {
-            uid: '123',
-            email: 'test@test.com'
-        };
-
-        (firebaseAuth.getAuth as any).mockReturnValue({
-            currentUser: successful ? user : null
-        });
-
-        if (successful) firebaseAuth.authChangeCallback();
-
-        return {
-            user
-        };
-    });
+    (firebaseAuth.createUserWithEmailAndPassword as any).mockImplementation(setUserCreds(firebaseAuth, successful));
 }
+
+
 
 function spyOnUserStatusChangeEvent(auth: Auth) {
     const spy = vi.fn();

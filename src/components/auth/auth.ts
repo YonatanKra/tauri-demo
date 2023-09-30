@@ -21,8 +21,11 @@ export class Auth extends HTMLElement {
         this.dispatchEvent(new CustomEvent('user-status-change'));
     }
 
+    #handleAuthChange = () => {
+        this.dispatchEvent(new CustomEvent('user-status-change'));
+    }
     constructor() {
         super();
-        onAuthStateChanged(getAuth(), () => this.dispatchEvent(new CustomEvent('user-status-change')));
+        onAuthStateChanged(getAuth(), this.#handleAuthChange);
     }
 }
