@@ -18,7 +18,6 @@ export class Auth extends HTMLElement {
     
     async logout() {
         await signOut(getAuth());
-        this.dispatchEvent(new CustomEvent('user-status-change'));
     }
 
     #handleAuthChange = () => {

@@ -10,7 +10,9 @@ vi.mock('firebase/auth', () => {
         signInWithEmailAndPassword: vi.fn(),
         fetchSignInMethodsForEmail: vi.fn(),
         createUserWithEmailAndPassword: vi.fn(),
-        signOut: vi.fn(),
+        signOut: vi.fn().mockImplementation(() => {
+            fbAuth.authChangeCallback();
+        }),
         onAuthStateChanged: vi.fn().mockImplementation((_auth: any, callback: any) => {
             fbAuth.authChangeCallback = callback 
         })
