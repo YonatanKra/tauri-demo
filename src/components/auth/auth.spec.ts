@@ -2,15 +2,20 @@ import { Auth } from './auth';
 
 const COMPONENT_NAME = 'yag-test';
 vi.mock('firebase/auth', () => {
-    return {
+    const fbAuth =  {
+        authChangeCallback: vi.fn(),
         getAuth: vi.fn().mockReturnValue({
             currentUser: null
         }),
         signInWithEmailAndPassword: vi.fn(),
         fetchSignInMethodsForEmail: vi.fn(),
         createUserWithEmailAndPassword: vi.fn(),
-        signOut: vi.fn()
-    }
+        signOut: vi.fn(),
+        onAuthStateChanged: vi.fn().mockImplementation((_auth: any, callback: any) => {
+            fbAuth.authChangeCallback = callback 
+        })
+    };
+    return fbAuth;
 });
 
 describe('auth', () => {
@@ -145,6 +150,7 @@ function setLogin(firebaseAuth: any, successful: boolean) {
             currentUser: successful ? user : null
         });
 
+        if (successful) firebaseAuth.authChangeCallback();
 
         return {
             user
@@ -163,6 +169,7 @@ function setSignUp(firebaseAuth: any, successful: boolean) {
             currentUser: successful ? user : null
         });
 
+        if (successful) firebaseAuth.authChangeCallback();
 
         return {
             user

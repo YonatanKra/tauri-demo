@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 export class Auth extends HTMLElement {
 
@@ -14,9 +14,6 @@ export class Auth extends HTMLElement {
         } else {
             await signInWithEmailAndPassword(auth, email, password);
         }
-        if (this.isLoggedIn()) {
-            this.dispatchEvent(new CustomEvent('user-status-change'));
-        }
     }
     
     async logout() {
@@ -26,5 +23,6 @@ export class Auth extends HTMLElement {
 
     constructor() {
         super();
+        onAuthStateChanged(getAuth(), () => this.dispatchEvent(new CustomEvent('user-status-change')));
     }
 }
