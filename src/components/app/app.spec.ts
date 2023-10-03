@@ -114,12 +114,9 @@ describe('app', () => {
         addEventListenerSpy.mockRestore();
     });
 
-    it('should display login screen if auth component is not initialized', () => {
-        const originalIsLoggedIn = MockAuth.prototype.isLoggedIn;
-        MockAuth.prototype.isLoggedIn = undefined;
+    it('should display "Loading..." if auth component is not initialized', () => {
         app.connectedCallback();
-        MockAuth.prototype.isLoggedIn = originalIsLoggedIn;
-        expect(getElementInView('yag-login')).toBeTruthy();
+        expect(getElementInView('#main-content')?.textContent?.trim()).toBe('Loading...');
     });
 
     it('should evoke the login function from Auth on `login-attempt` event', () => {

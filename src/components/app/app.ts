@@ -51,7 +51,7 @@ export class App extends HTMLElement {
                 <vwc-button id="login-button" slot="hidden" appearance="filled" connotation="alert" label="Sign out"></vwc-button>
                 <main slot="app-content">
                     <vwc-layout gutters="small" id="main-content">
-                        Application content
+                        Loading...
                     </vwc-layout>
                 </main>
             </vwc-header>
@@ -64,7 +64,6 @@ export class App extends HTMLElement {
             this.#authComponent = document.createElement('yag-auth') as HTMLElement;
             this.#authComponent.addEventListener('user-status-change', this.#setViewAccordingToUserStatus);
         }
-        this.#setViewAccordingToUserStatus();
     }
 
     disconnectedCallback() {
