@@ -8,17 +8,20 @@ class MockAuth extends HTMLElement {
         authComponent = this;
     }
 
-    isLoggedIn?() {
-        return isLoggedIn;
-    }
+    isLoggedIn() {}
 
     login(_email: string, _password: string) {}
 
     logout = vi.fn();
 }
+
 customElements.define('yag-auth', MockAuth);
 let authComponent: MockAuth | HTMLElement = document.createElement('div');
-let isLoggedIn = true;
+
+function setLoginStatus(isLoggedIn: boolean) {
+    authComponent.isLoggedIn = vi.fn().mockReturnValue(isLoggedIn);
+    authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+}
 
 describe('app', () => {
     function getElementInView(query: string) {
@@ -40,57 +43,58 @@ describe('app', () => {
     });
 
     it('should remove `yag-greeter` when user is not logged in', () => {
-        isLoggedIn = false;
         app.connectedCallback();
+        setLoginStatus(false);
         expect(getElementInView('yag-greeter')).toBeFalsy();
     });
 
     it('should display `yag-greeter` when user is logged in', () => {
-        isLoggedIn = true;
         app.connectedCallback();        
+        setLoginStatus(true);
         expect(getElementInView('yag-greeter')).toBeTruthy();
     });
 
     it('should display `yag-login` when user is not logged in', () => {
-        isLoggedIn = false;
         app.connectedCallback();
+        setLoginStatus(false);
         expect(getElementInView('yag-login')).toBeTruthy();
     });
 
     it('should remove `yag-login` when user is logged in', () => {
-        isLoggedIn = true;
         app.connectedCallback();
+        setLoginStatus(true);
         expect(getElementInView('yag-login')).toBeFalsy();
     });
 
     it('should display `yag-login` when user logs out', () => {
-        isLoggedIn = true;
         app.connectedCallback();
-        isLoggedIn = false;
+        setLoginStatus(true);
+        setLoginStatus(false);
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(getElementInView('yag-login')).toBeTruthy();
     });
 
     it('should hide yag-login when user logs in', () => {
-        isLoggedIn = false;
+        
         app.connectedCallback();
-        isLoggedIn = true;
+        setLoginStatus(false);
+        setLoginStatus(true);
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(getElementInView('yag-login')).toBeFalsy();
     });
 
     it('should display `yag-greeter` when user logs in', () => {
-        isLoggedIn = false;
         app.connectedCallback();
-        isLoggedIn = true;
+        setLoginStatus(false);
+        setLoginStatus(true);
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(getElementInView('yag-greeter')).toBeTruthy();
     });
 
     it('should hide `yag-greeter` when user logs out', () => {
-        isLoggedIn = true;
         app.connectedCallback();
-        isLoggedIn = false;
+        setLoginStatus(true);
+        setLoginStatus(false);
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(getElementInView('yag-greeter')).toBeFalsy();
     });
@@ -100,8 +104,10 @@ describe('app', () => {
         app.connectedCallback();
         const oldAuthComponent = authComponent;  
         const removeEventListenerSpy = vi.spyOn(oldAuthComponent, 'removeEventListener');   
+
         app.disconnectedCallback();
         app.connectedCallback();
+
         expect(addEventListenerSpy).toHaveBeenCalledWith('user-status-change', expect.any(Function));
         expect(removeEventListenerSpy).toHaveBeenCalledWith('user-status-change', expect.any(Function));
         expect(removeEventListenerSpy.mock.calls[0][1]).toBe(addEventListenerSpy.mock.calls[0][1]);
@@ -109,7 +115,6 @@ describe('app', () => {
     });
 
     it('should display login screen if auth component is not initialized', () => {
-        isLoggedIn = true;
         const originalIsLoggedIn = MockAuth.prototype.isLoggedIn;
         MockAuth.prototype.isLoggedIn = undefined;
         app.connectedCallback();
@@ -118,8 +123,9 @@ describe('app', () => {
     });
 
     it('should evoke the login function from Auth on `login-attempt` event', () => {
-        isLoggedIn = false;
+        
         app.connectedCallback();
+        setLoginStatus(false);
         const email = 'ff@gmail.com';
         const password = '123456';
         const loginComponent = app.shadowRoot?.querySelector('yag-login');
@@ -129,11 +135,11 @@ describe('app', () => {
     });
 
     it('should remove `login-attempt` listener to the old loginComponent', () => {
-        isLoggedIn = false;
         app.connectedCallback();
+        setLoginStatus(false);
         const oldLoginComponent = app.shadowRoot?.querySelector('yag-login') as HTMLElement;  
         const removeEventListenerSpy = vi.spyOn(oldLoginComponent, 'removeEventListener'); 
-        isLoggedIn = true;  
+        setLoginStatus(true);
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(removeEventListenerSpy).toHaveBeenCalledWith('login-attempt', expect.any(Function));
         removeEventListenerSpy.mockRestore();
@@ -155,38 +161,42 @@ describe('app', () => {
         }
 
         it('should show a logout button to the header when user is logged in', () => {
-            isLoggedIn = true;
             app.connectedCallback();
+            setLoginStatus(true);
             expect(isLoginButtonVisible()).toBe(true);
         });
         
         it('should hide the logout button from the header when user is logged out', () => {
-            isLoggedIn = true;
+            
             app.connectedCallback();
-            isLoggedIn = false;
-            app.connectedCallback();
+            setLoginStatus(true);
+            setLoginStatus(false);
+
             expect(isLoginButtonHidden()).toBe(true);
         });    
 
         it('should add a logout button to the header when user logs in', () => {
-            isLoggedIn = false;
+            
             app.connectedCallback();
-            isLoggedIn = true;
-            authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+            setLoginStatus(false);
+            setLoginStatus(true);
+            
             expect(isLoginButtonVisible()).toBe(true);
         });
 
         it('should remove the logout button from the header when user logs out', () => {
-            isLoggedIn = true;
+            
             app.connectedCallback();
-            isLoggedIn = false;
-            authComponent.dispatchEvent(new CustomEvent('user-status-change'));
+            setLoginStatus(true);
+            setLoginStatus(false);
+            
             expect(isLoginButtonHidden()).toBe(true);
         });
 
         it('should call `logout` on auth component when logout button is clicked', () => {
-            isLoggedIn = true;
+            
             app.connectedCallback();
+            setLoginStatus(true);
             getLogoutButton()?.dispatchEvent(new CustomEvent('click'));
             expect(authComponent.logout).toHaveBeenCalled();
         });
