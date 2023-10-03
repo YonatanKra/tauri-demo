@@ -52,6 +52,7 @@ export class App extends HTMLElement {
                 <main slot="app-content">
                     <vwc-layout gutters="small" id="main-content">
                         Loading...
+                        <vwc-progress-ring connotation="cta"></vwc-progress-ring>
                     </vwc-layout>
                 </main>
             </vwc-header>
