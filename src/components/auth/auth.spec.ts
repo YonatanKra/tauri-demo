@@ -67,7 +67,7 @@ describe('auth', () => {
             setUserSignInMethods(firebaseAuth, ['password']);
             setLogin(firebaseAuth, SUCCESSFUL);
             const spy = spyOnUserStatusChangeEvent(auth);
-
+            
             await auth.login('email', 'password');
             const eventCallsWithSuccessfulLogin = spy.mock.calls.length;
 
@@ -128,7 +128,7 @@ describe('auth', () => {
             expect(firebaseAuth.signOut).toHaveBeenCalledWith(firebaseAuth.getAuth());
         });
 
-        it('should emit `user-status-change` event', async () => {
+        it('should emit `user-status-change` event when user logs out successfully', async () => {
             const spy = spyOnUserStatusChangeEvent(auth);
 
             await auth.logout();
