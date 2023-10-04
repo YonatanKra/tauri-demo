@@ -29,7 +29,15 @@ export class App extends HTMLElement {
     }
 
     #setViewAccordingToUserStatus = () => {
-        if (!this.#authComponent!.isLoggedIn || this.#authComponent!.isLoggedIn?.() === false) {
+        const isAuthComponentSet = !!this.#authComponent!.isLoggedIn;
+        const isLoggedIn = isAuthComponentSet && this.#authComponent!.isLoggedIn?.();
+        const isUserEmailVerified = isAuthComponentSet && this.#authComponent!.isUserEmailVerified?.();
+        
+        if (isLoggedIn && isUserEmailVerified === false) {
+            return this.#authComponent!.logout();
+        }
+
+        if (!isAuthComponentSet || !isLoggedIn) {
             this.#loginButton.setAttribute('slot', 'hidden');
             this.#mainContent.innerHTML = `<yag-login></yag-login>`;
             this.#setLoginListener();

@@ -13,6 +13,8 @@ class MockAuth extends HTMLElement {
     login(_email: string, _password: string) {}
 
     logout = vi.fn();
+
+    isUserEmailVerified = vi.fn();
 }
 
 customElements.define('yag-auth', MockAuth);
@@ -140,6 +142,14 @@ describe('app', () => {
         authComponent.dispatchEvent(new CustomEvent('user-status-change'));
         expect(removeEventListenerSpy).toHaveBeenCalledWith('login-attempt', expect.any(Function));
         removeEventListenerSpy.mockRestore();
+    });
+
+    it('should logout user if logged in and email not verified', () => {
+        app.connectedCallback();
+        authComponent.isUserEmailVerified.mockReturnValue(false);
+        const spy = vi.spyOn(authComponent, 'logout');
+        setLoginStatus(true);
+        expect(spy).toHaveBeenCalled();
     });
 
     describe('login button', () => {
