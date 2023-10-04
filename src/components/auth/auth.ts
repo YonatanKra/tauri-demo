@@ -6,6 +6,10 @@ export class Auth extends HTMLElement {
         return getAuth().currentUser !== null;
     }
 
+    isUserEmailVerified() {
+        return getAuth().currentUser?.emailVerified;
+    }
+
     async #isUserRegistered(email: string) {
         const signInMethods = await fetchSignInMethodsForEmail(getAuth(), email);
         return signInMethods.length > 0;

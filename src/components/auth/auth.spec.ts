@@ -146,13 +146,26 @@ describe('auth', () => {
             expect(eventCalls).toBe(1);
         });
     });
+
+    describe('isUserEmailVerified', () => {
+        it('should return true if user email is verified', async () => {
+            const firebaseAuth = await import('firebase/auth');
+            setUserCreds(firebaseAuth, true, {emailVerified: true})();
+            expect(auth.isUserEmailVerified()).toBe(true);
+        });
+    });
 });
 
 const SUCCESSFUL = true;
 const UNSUCCESSFUL = false;
-function setUserCreds(firebaseAuth: any, successful: boolean, user = {
+interface User {
+    uid?: string;
+    email?: string;
+    emailVerified?: boolean;
+};
+function setUserCreds(firebaseAuth: any, successful: boolean, user: User = {
     uid: '123',
-    email: 'test@test.com'
+    email: 'test@test.com',
 }) {
     return async () => {
         (firebaseAuth.getAuth as any).mockReturnValue({
