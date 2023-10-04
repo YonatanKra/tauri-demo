@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail, getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, sendEmailVerification } from "firebase/auth";
 
 export class Auth extends HTMLElement {
 
@@ -6,13 +6,21 @@ export class Auth extends HTMLElement {
         return getAuth().currentUser !== null;
     }
 
-    async login(email: string, password: string) {
-        const auth = getAuth();
-        const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-        if (signInMethods.length === 0) {
-            await createUserWithEmailAndPassword(auth, email, password);
+    async #isUserRegistered(email: string) {
+        const signInMethods = await fetchSignInMethodsForEmail(getAuth(), email);
+        return signInMethods.length > 0;
+    }
+
+    async #registerUser(email: string, password: string) {
+        await createUserWithEmailAndPassword(getAuth(), email, password);
+        await sendEmailVerification(getAuth().currentUser!);
+    }
+
+    async login(email: string, password: string) {        
+        if (await this.#isUserRegistered(email) === false) {
+            await this.#registerUser(email, password);
         } else {
-            await signInWithEmailAndPassword(auth, email, password);
+            await signInWithEmailAndPassword(getAuth(), email, password);
         }
     }
     

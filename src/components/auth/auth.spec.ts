@@ -15,7 +15,8 @@ vi.mock('firebase/auth', () => {
         }),
         onAuthStateChanged: vi.fn().mockImplementation((_auth: any, callback: any) => {
             fbAuth.authChangeCallback = callback 
-        })
+        }),
+        sendEmailVerification: vi.fn(),
     };
     return fbAuth;
 });
@@ -93,6 +94,14 @@ describe('auth', () => {
             expect(firebaseAuth.createUserWithEmailAndPassword).toHaveBeenCalledWith(firebaseAuth.getAuth(), email, password);
         });
 
+        it('should send email verification when user registers', async () => {
+            setSignUp(firebaseAuth, SUCCESSFUL);
+            const email = 't@t.com';
+            const password = '123456';
+            await auth.login(email, password);
+            expect(firebaseAuth.sendEmailVerification).toHaveBeenCalledWith(firebaseAuth.getAuth().currentUser);
+        });
+
         it('should emit `user-status-change` event when signup successful', async () => {
             setUserSignInMethods(firebaseAuth, [])
             setSignUp(firebaseAuth, SUCCESSFUL);
@@ -165,7 +174,6 @@ function setLogin(firebaseAuth: any, successful: boolean) {
 function setSignUp(firebaseAuth: any, successful: boolean) {
     (firebaseAuth.createUserWithEmailAndPassword as any).mockImplementation(setUserCreds(firebaseAuth, successful));
 }
-
 
 
 function spyOnUserStatusChangeEvent(auth: Auth) {
