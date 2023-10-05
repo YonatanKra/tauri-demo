@@ -1,6 +1,7 @@
 import '@vonage/vivid/header';
 import '@vonage/vivid/layout';
 import '@vonage/vivid/button';
+import '@vonage/vivid/alert';
 
 export class App extends HTMLElement {
 
@@ -12,6 +13,10 @@ export class App extends HTMLElement {
         return this.shadowRoot!.getElementById('login-button') as HTMLElement;
     }
 
+    get #alertComponent() {
+        return this.shadowRoot!.getElementById('alert') as HTMLElement;
+    }
+
     #handleLoginAttempt = (e: Event) => {
         const { email, password } = (<CustomEvent>e).detail;
         this.#authComponent?.login(email, password);
@@ -20,6 +25,7 @@ export class App extends HTMLElement {
     get #loginElement () {
         return this.shadowRoot!.querySelector('yag-login') as HTMLElement;
     }
+
     #setLoginListener = () => {
         this.#loginElement.addEventListener('login-attempt', this.#handleLoginAttempt);
     }
@@ -55,6 +61,7 @@ export class App extends HTMLElement {
         this.attachShadow({mode: 'open'});
         this.shadowRoot!.innerHTML = `
             <vwc-header>
+                <vwc-alert id="alert" removable connotation="alert" placement="top"></vwc-alert>
                 <h1>Your Awesome Game!</h1> (yag... dah...)
                 <vwc-button id="login-button" slot="hidden" appearance="filled" connotation="alert" label="Sign out"></vwc-button>
                 <main slot="app-content">
@@ -77,5 +84,11 @@ export class App extends HTMLElement {
 
     disconnectedCallback() {
         this.#authComponent?.removeEventListener('user-status-change', this.#setViewAccordingToUserStatus);
+    }
+
+    alert({message, title = 'Alert'} : {message: string, title?: string}) {
+        this.#alertComponent.setAttribute('headline', title!);
+        this.#alertComponent.setAttribute('text', message);
+        this.#alertComponent.toggleAttribute('open', true);
     }
 }

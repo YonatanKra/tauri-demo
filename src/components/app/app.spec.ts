@@ -209,5 +209,32 @@ describe('app', () => {
         });
     });
     
+    describe('alert', () => {
+        it('should display an alert with given message and title', () => {
+            app.connectedCallback();
+            const message = 'some message';
+            const title = 'some title';
+            app.alert({message, title});
+            const alert = app.shadowRoot?.querySelector('#alert');
+            expect(alert?.getAttribute('Headline')).toBe(title);
+            expect(alert?.getAttribute('text')).toBe(message);
+        });
 
+        it('should display an alert with given message and default title', () => {
+            app.connectedCallback();
+            const message = 'some message';
+            app.alert({message});
+            const alert = app.shadowRoot?.querySelector('#alert');
+            expect(alert?.getAttribute('Headline')).toBe('Alert');
+            expect(alert?.getAttribute('text')).toBe(message);
+        });
+
+        it('should open the alert', () => {
+            app.connectedCallback();
+            const message = 'some message';
+            app.alert({message});
+            const alert = app.shadowRoot?.querySelector('#alert');
+            expect(alert?.hasAttribute('open')).toBe(true);
+        });
+    });
 });
