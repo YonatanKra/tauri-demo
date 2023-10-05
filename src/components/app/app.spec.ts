@@ -152,6 +152,14 @@ describe('app', () => {
         expect(spy).toHaveBeenCalled();
     });
 
+    it('should display an alert if user is logged in and email not verified', () => {
+        app.connectedCallback();
+        authComponent.isUserEmailVerified.mockReturnValue(false);
+        const spy = vi.spyOn(app, 'alert');
+        setLoginStatus(true);
+        expect(spy).toHaveBeenCalledWith({message: 'Please verify your email address', title: 'Email not verified'});
+    });
+
     describe('login button', () => {
         function getLogoutButton() {
             return app.shadowRoot?.querySelector('#login-button');

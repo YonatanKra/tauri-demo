@@ -38,9 +38,11 @@ export class App extends HTMLElement {
         const isAuthComponentSet = !!this.#authComponent!.isLoggedIn;
         const isLoggedIn = isAuthComponentSet && this.#authComponent!.isLoggedIn?.();
         const isUserEmailVerified = isAuthComponentSet && this.#authComponent!.isUserEmailVerified?.();
-        
+
         if (isLoggedIn && isUserEmailVerified === false) {
-            return this.#authComponent!.logout();
+            this.#authComponent!.logout();
+            this.alert({message: 'Please verify your email address', title: 'Email not verified'});
+            return;
         }
 
         if (!isAuthComponentSet || !isLoggedIn) {
