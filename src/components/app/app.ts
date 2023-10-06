@@ -2,6 +2,7 @@ import '@vonage/vivid/header';
 import '@vonage/vivid/layout';
 import '@vonage/vivid/button';
 import '@vonage/vivid/alert';
+import { Auth } from '..';
 
 const template = `
 <vwc-header>
@@ -50,18 +51,26 @@ export class App extends HTMLElement {
         this.#loginElement?.removeEventListener('login-attempt', this.#handleLoginAttempt);
     }
 
+    get #authComponent (): Auth {
+        if (this.shadowRoot!.querySelector('#auth') === null) {
+            const authComponent = document.createElement('yag-auth') as HTMLElement;
+            authComponent.id = 'auth';
+            this.shadowRoot!.appendChild(authComponent);
+        }
+        return this.shadowRoot!.querySelector('#auth') as HTMLElement;
+    }
+
     #setViewAccordingToUserStatus = () => {
-        const isAuthComponentSet = !!this.#authComponent!.isLoggedIn;
-        const isLoggedIn = isAuthComponentSet && this.#authComponent!.isLoggedIn?.();
-        const isUserEmailVerified = isAuthComponentSet && this.#authComponent!.isUserEmailVerified?.();
+        const isLoggedIn = this.#authComponent.isLoggedIn();
+        const isUserEmailVerified = this.#authComponent.isUserEmailVerified();
 
         if (isLoggedIn && isUserEmailVerified === false) {
-            this.#authComponent!.logout();
+            this.#authComponent.logout();
             this.alert({message: 'Please verify your email address', title: 'Email not verified'});
             return;
         }
 
-        if (!isAuthComponentSet || !isLoggedIn) {
+        if (!isLoggedIn) {
             this.#loginButton.setAttribute('slot', 'hidden');
             this.#mainContent.innerHTML = `<yag-login></yag-login>`;
             this.#setLoginListener();
@@ -71,8 +80,6 @@ export class App extends HTMLElement {
             this.#mainContent.innerHTML = `<yag-greeter></yag-greeter>`;
         }
     }
-
-    #authComponent?: HTMLElement;
 
     constructor() {
         super();
@@ -84,10 +91,7 @@ export class App extends HTMLElement {
     }
 
     connectedCallback() {
-        if (this.#authComponent === undefined) {
-            this.#authComponent = document.createElement('yag-auth') as HTMLElement;
-            this.#authComponent.addEventListener('user-status-change', this.#setViewAccordingToUserStatus);
-        }
+        this.#authComponent.addEventListener('user-status-change', this.#setViewAccordingToUserStatus);
     }
 
     disconnectedCallback() {
