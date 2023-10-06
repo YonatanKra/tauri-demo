@@ -3,6 +3,22 @@ import '@vonage/vivid/layout';
 import '@vonage/vivid/button';
 import '@vonage/vivid/alert';
 
+const template = `
+<vwc-header>
+    <vwc-alert id="alert" removable connotation="alert" placement="top"></vwc-alert>
+    <h1>Your Awesome Game!</h1> (yag... dah...)
+    <vwc-button id="login-button" slot="hidden" appearance="filled" connotation="alert" label="Sign out"></vwc-button>
+    <main slot="app-content">
+        <vwc-layout gutters="small" id="main-content">
+            Loading...
+            <vwc-progress-ring connotation="cta"></vwc-progress-ring>
+        </vwc-layout>
+    </main>
+</vwc-header>
+`;
+const templateElement = document.createElement('template');
+templateElement.innerHTML = template;
+
 export class App extends HTMLElement {
 
     get #mainContent() {
@@ -61,19 +77,9 @@ export class App extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({mode: 'open'});
-        this.shadowRoot!.innerHTML = `
-            <vwc-header>
-                <vwc-alert id="alert" removable connotation="alert" placement="top"></vwc-alert>
-                <h1>Your Awesome Game!</h1> (yag... dah...)
-                <vwc-button id="login-button" slot="hidden" appearance="filled" connotation="alert" label="Sign out"></vwc-button>
-                <main slot="app-content">
-                    <vwc-layout gutters="small" id="main-content">
-                        Loading...
-                        <vwc-progress-ring connotation="cta"></vwc-progress-ring>
-                    </vwc-layout>
-                </main>
-            </vwc-header>
-        `;
+        const templateHTML = templateElement.content.cloneNode(true);
+        this.shadowRoot?.appendChild(templateHTML);
+
         this.#loginButton.addEventListener('click', () => this.#authComponent?.logout());
     }
 
